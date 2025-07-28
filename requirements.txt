@@ -1,0 +1,7 @@
+python-telegram-bot
+bambulabs-api
+datetime
+json
+urllib3
+requests
+PIL
