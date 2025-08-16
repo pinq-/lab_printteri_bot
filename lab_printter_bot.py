@@ -83,13 +83,20 @@ async def octo_status(update, context):
     await update.message.reply_text(
 		'Printter status: ' + str(stats['state']) + "\n")
     if stats['state'] != 'Operational':
+    	try:
+    		remainig_time = str(datetime.timedelta(seconds=stats['progress']['printTimeLeft']))
+    		whole_time = str(datetime.timedelta(seconds=int(stats['progress']['printTime'])))
+    	except:
+    		remainig_time = '--'
+    		whole_time = '--'
+
     	await update.message.reply_text(
 			#'Layers: ' + str(stats['layer_num']) + "/" + str(stats['total_layer_num']) + "\n"
-			#'Percentage: ' + str(stats['percentage']) + " %" + "\n"
+			'Percentage: ' + str(round(stats['progress']['completion'])) + " %" + "\n"
 			#'Bed tempereture: ' + str(stats['bed_temperature']) + " C" + "\n"
 			#'Nozzle tempereture: ' + str(stats['nozzle_temperature']) + " C" + "\n"
-			'Remaining time: ' + str(datetime.timedelta(seconds=stats['progress']['printTimeLeft']))  + "\n"
-			'Whole time: ' + str(datetime.timedelta(seconds=int(stats['job']['estimatedPrintTime'])))  + "\n"
+			'Remaining time: ' + remainig_time  + "\n"
+			'Whole time: ' + whole_time  + "\n"
 			#'Finish time: ' + str(stats['finish_time_format'])  + "\n"
 			)
     img = Image.open('octo_img_1.jpg').transpose(Image.ROTATE_180).save('octo_img_1.jpg')
