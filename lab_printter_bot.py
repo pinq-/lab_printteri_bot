@@ -55,6 +55,7 @@ def get_octo_status():
 
 
 async def bambu_status(update, context):
+    await update.message.reply_text("Haetaan bambun tietoja")
     bambu_stats = get_bambulabs_stats()
     if bambu_stats['percentage'] is None:
     	await update.message.reply_text("Tietoja ei saatavissa")
@@ -78,24 +79,29 @@ async def bambu_status(update, context):
 async def octo_status(update, context):
     stats = get_octo_status()
     #print(stats)
+    await update.message.reply_text("Haetaan octon tietoja")
     await update.message.reply_text(
-    	'Printter status: ' + str(stats['state']) + "\n"
-    	#'Layers: ' + str(stats['layer_num']) + "/" + str(stats['total_layer_num']) + "\n"
-    	#'Percentage: ' + str(stats['percentage']) + " %" + "\n"
-    	#'Bed tempereture: ' + str(stats['bed_temperature']) + " C" + "\n"
-    	#'Nozzle tempereture: ' + str(stats['nozzle_temperature']) + " C" + "\n"
-    	'Remaining time: ' + str(datetime.timedelta(seconds=stats['progress']['printTimeLeft']))  + "\n"
-    	'Whole time: ' + str(datetime.timedelta(seconds=int(stats['job']['estimatedPrintTime'])))  + "\n"
-    	#'Finish time: ' + str(stats['finish_time_format'])  + "\n"
-    	)
+		'Printter status: ' + str(stats['state']) + "\n")
+    if stats['state'] != 'Operational':
+    	await update.message.reply_text(
+			#'Layers: ' + str(stats['layer_num']) + "/" + str(stats['total_layer_num']) + "\n"
+			#'Percentage: ' + str(stats['percentage']) + " %" + "\n"
+			#'Bed tempereture: ' + str(stats['bed_temperature']) + " C" + "\n"
+			#'Nozzle tempereture: ' + str(stats['nozzle_temperature']) + " C" + "\n"
+			'Remaining time: ' + str(datetime.timedelta(seconds=stats['progress']['printTimeLeft']))  + "\n"
+			'Whole time: ' + str(datetime.timedelta(seconds=int(stats['job']['estimatedPrintTime'])))  + "\n"
+			#'Finish time: ' + str(stats['finish_time_format'])  + "\n"
+			)
     img = Image.open('octo_img_1.jpg').transpose(Image.ROTATE_180).save('octo_img_1.jpg')
 
     with open('octo_img_1.jpg', 'rb') as img_1:
     	await context.bot.send_photo(chat_id=update.effective_chat.id, photo=img_1)
-    with open('octo_img_2.png', 'rb') as img_2:
+    with open('octo_img_2.jpg', 'rb') as img_2:
     	await context.bot.send_photo(chat_id=update.effective_chat.id, photo=img_2)
     #await context.bot.send_photo(chat_id=update.effective_chat.id, photo = img)
 
+async def bot_status(update, context):
+	await update.message.reply_text("Botti on toiminnassa")
 
 def main():
     """
@@ -104,8 +110,9 @@ def main():
     token = extra_info.telegram_bot_api
     application = Application.builder().token(token).concurrent_updates(True).read_timeout(30).write_timeout(30).build()
     #application.add_handler(MessageHandler(filters.TEXT, reply))
-    application.add_handler(CommandHandler("bambu", bambu_status)) # new command handler here
-    application.add_handler(CommandHandler("octo", octo_status)) # new command handler here
+    application.add_handler(CommandHandler("bambu", bambu_status)) # Bambulab status
+    application.add_handler(CommandHandler("octo", octo_status)) # Octoprint status
+    application.add_handler(CommandHandler("status", bot_status)) # bot status
     print("Telegram Bot started!", flush=True)
     application.run_polling()
 
